@@ -41,4 +41,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: NighatShaheen/commons-codec:latest
+          tags: nighat2414/commons-codec:latest
