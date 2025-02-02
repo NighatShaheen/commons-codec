@@ -1,4 +1,4 @@
-name: JaCoCo Test
+name: PiTest
 
 on: [push, pull_request]
 
@@ -7,7 +7,6 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -47,3 +46,4 @@ jobs:
         with:
           name: pitest-report-${{ github.run_id }}
           path: target/site/pitest/index.html
+          include-hidden-files: false
