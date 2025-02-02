@@ -1,43 +1,49 @@
-   /*
-    * Licensed to the Apache Software Foundation (ASF) under one or more
-    * contributor license agreements.  See the NOTICE file distributed with
-    * this work for additional information regarding copyright ownership.
-    * The ASF licenses this file to You under the Apache License, Version 2.0
-    * (the "License"); you may not use this file except in compliance with
-    * the License.  You may obtain a copy of the License at
-    *
-    *    http://www.apache.org/licenses/LICENSE-2.0
-    *
-    * Unless required by applicable law or agreed to in writing, software
-    * distributed under the License is distributed on an "AS IS" BASIS,
-    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    * See the License for the specific language governing permissions and
-    * limitations under the License.
-    */
-name: Java CI with JaCoCo
+name: JaCoCo Test
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
+
+permissions:
+  contents: read
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      matrix:
+        java: [8, 11, 17, 21, 23]
+        experimental: [false]
+        include:
+          - java: 24-ea
+            experimental: true
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v2
         with:
-          java-version: '17'
+          persist-credentials: false
 
-      - name: Build and Test
-        run: |
-          ./mvn -Drat.skip=true clean verify # For Maven
-          # ./gradlew test jacocoTestReport # For Gradle
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+
+      - name: Build with Maven
+        run: mvn -Drat.skip=true package --errors --show-version --batch-mode --no-transfer-progress
+
+      - name: Generate JaCoCo report
+        run: mvn -Drat.skip=true clean test jacoco:report
+
+      - name: Upload JaCoCo HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report-${{ github.run_id }}
+          path: target/site/jacoco/index.html
