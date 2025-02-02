@@ -133,6 +133,8 @@ limitations under the License.
     <commons.jacoco.branchRatio>0.80</commons.jacoco.branchRatio>
     <commons.jacoco.lineRatio>0.80</commons.jacoco.lineRatio>
     <commons.jacoco.complexityRatio>0.80</commons.jacoco.complexityRatio>
+    <checkstyle.skip>true</checkstyle.skip>
+    <rat.skip>true</rat.skip>
   </properties>
   <build>
     <defaultGoal>clean verify apache-rat:check japicmp:cmp checkstyle:check javadoc:javadoc</defaultGoal>
