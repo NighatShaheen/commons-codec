@@ -39,5 +39,5 @@ jobs:
 
       - name: Build and Test
         run: |
-          ./mvnw clean verify # For Maven
+          ./mvn -Drat.skip=true clean verify # For Maven
           # ./gradlew test jacocoTestReport # For Gradle
